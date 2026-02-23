@@ -1,0 +1,47 @@
+package com.rede.stagingapi.model;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+@Data
+@Entity
+public class Tote {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Temperature band required")
+    private TempBand temp; // Ambient, Chilled, Frozen, Hot, Unknown
+
+    @Enumerated(EnumType.STRING)
+    private ToteStatus status; // Picking, Unstaged, Staged, Returned
+    private String location; // Ambient 1, Chilled 2, Frozen 3, Hot Case...
+
+    private LocalDateTime toteCreatedTime;
+    private LocalDateTime pickWalkFinishedAt;
+    private LocalDateTime pickWalkDueAt;
+    private boolean fragile;
+    @Pattern(regexp = "^[0-9]{4}$", message = "Code must be 4 digits, each 0-9")
+    private String osn;
+    private String orderNumber;
+
+
+    @OneToMany(mappedBy = "tote",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ToteItem> items = new ArrayList<>();
+    private int numItems;
+
+    @PrePersist
+    protected void onCreate(){
+        this.toteCreatedTime = LocalDateTime.now();
+    }
+
+}
