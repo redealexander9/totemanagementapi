@@ -27,6 +27,7 @@ public class Tote {
     private String location; // Ambient 1, Chilled 2, Frozen 3, Hot Case...
 
     private LocalDateTime toteCreatedTime;
+    private LocalDateTime firstItemPickedAt;
     private LocalDateTime pickWalkFinishedAt;
     private LocalDateTime pickWalkDueAt;
     private boolean fragile;
@@ -37,11 +38,19 @@ public class Tote {
 
     @OneToMany(mappedBy = "tote",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ToteItem> items = new ArrayList<>();
-    private int numItems;
+    public int getNumItems() {
+        return items.size();
+    }
 
     @PrePersist
     protected void onCreate(){
         this.toteCreatedTime = LocalDateTime.now();
     }
+    public void addItem(ToteItem item){
+        if(getNumItems() == 0){
+            firstItemPickedAt = LocalDateTime.now();
+        }
+        items.add(item);
 
+    }
 }
