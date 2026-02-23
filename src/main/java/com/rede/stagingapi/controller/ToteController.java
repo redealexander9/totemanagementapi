@@ -1,13 +1,12 @@
 package com.rede.stagingapi.controller;
 
 
+import com.rede.stagingapi.exception.ItemNotFoundException;
 import com.rede.stagingapi.exception.ToteNotFoundException;
 import com.rede.stagingapi.exception.ToteWarnings;
-import com.rede.stagingapi.model.StageToteRequest;
-import com.rede.stagingapi.model.TempBand;
-import com.rede.stagingapi.model.Tote;
+import com.rede.stagingapi.model.*;
+import com.rede.stagingapi.repository.ItemRepository;
 import com.rede.stagingapi.repository.ToteRepository;
-import com.rede.stagingapi.model.ToteStatus;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +27,11 @@ public class ToteController {
     private final ToteRepository toteRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(ToteController.class);
+    private final ItemRepository itemRepository;
 
-    public ToteController(ToteRepository toteRepository){
+    public ToteController(ToteRepository toteRepository, ItemRepository itemRepository){
         this.toteRepository = toteRepository;
+        this.itemRepository = itemRepository;
     }
 
     @PostMapping
@@ -48,10 +50,19 @@ public class ToteController {
     }
     @PostMapping("/{id}/edit")
     public Tote editTote(@PathVariable long id, @RequestBody Tote editedTote){
-        Tote tote = toteRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tote not found"));
+        Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
         int numItems = editedTote.getNumItems();
 
-        tote.setNumItems(numItems);
+        //tote.setNumItems(numItems);
+        toteRepository.save(tote);
+        return tote;
+    }
+
+    @PostMapping("/{id}/addItem")
+    public Tote addItemToTote(@PathVariable long id, @RequestBody long upc){
+        Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
+        ToteItem itemToAdd = itemRepository.findById(upc).orElseThrow(() -> new ItemNotFoundException(upc));
+        tote.addItem(itemToAdd);
         toteRepository.save(tote);
         return tote;
     }
@@ -74,6 +85,7 @@ public class ToteController {
         if(locationFull(stagingLocation, osn)){
             warnings.add(ToteWarnings.LOCATION_FULL);
         }
+        //if(temp == TempBand.CHILLED && )
         if(!warnings.isEmpty() && !confirm){
             return ResponseEntity.ok(Map.of(
                     "warnings", warnings,

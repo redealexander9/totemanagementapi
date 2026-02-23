@@ -3,6 +3,7 @@ package com.rede.stagingapi.exception;
 public enum ToteWarnings {
     EMPTY_TOTE,
     LOCATION_FULL,
-    INCORRECT_TEMP_BAND
+    INCORRECT_TEMP_BAND,
+    BROKEN_COLD_CHAIN
 
 }
