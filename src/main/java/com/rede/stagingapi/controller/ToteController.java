@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +76,14 @@ public class ToteController {
         String osn = tote.getOsn();
         Boolean confirm = request.getConfirm();
         List<ToteWarnings> warnings = new ArrayList<>();
-
+        LocalDateTime firstItemPickedAt = tote.getFirstItemPickedAt();
+        Duration duration = null;
+        if(firstItemPickedAt != null){
+            duration = Duration.between(firstItemPickedAt, LocalDateTime.now());
+        }
+        if(temp == TempBand.CHILLED && duration != null && duration.toHours() >= 1){
+            warnings.add(ToteWarnings.BROKEN_COLD_CHAIN);
+        }
         if (tote.getNumItems() == 0) {
             warnings.add(ToteWarnings.EMPTY_TOTE);
         }
@@ -85,7 +93,6 @@ public class ToteController {
         if(locationFull(stagingLocation, osn)){
             warnings.add(ToteWarnings.LOCATION_FULL);
         }
-        //if(temp == TempBand.CHILLED && )
         if(!warnings.isEmpty() && !confirm){
             return ResponseEntity.ok(Map.of(
                     "warnings", warnings,
