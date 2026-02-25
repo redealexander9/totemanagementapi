@@ -27,13 +27,14 @@ public class Tote {
     private String location; // Ambient 1, Chilled 2, Frozen 3, Hot Case...
 
     private LocalDateTime toteCreatedTime;
-    private LocalDateTime firstItemPickedAt;
+    private LocalDateTime firstItemPickedAt = null; // For determining cold chain compliance
     private LocalDateTime pickWalkFinishedAt;
     private LocalDateTime pickWalkDueAt;
     private boolean fragile;
     @Pattern(regexp = "^[0-9]{4}$", message = "Code must be 4 digits, each 0-9")
     private String osn;
     private String orderNumber;
+    private List<String> pickerIds = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "tote",cascade = CascadeType.ALL, orphanRemoval = true)
