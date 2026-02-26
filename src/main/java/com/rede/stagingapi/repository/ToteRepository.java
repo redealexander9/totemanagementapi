@@ -1,7 +1,7 @@
 package com.rede.stagingapi.repository;
 
 import com.rede.stagingapi.model.Tote;
-import com.rede.stagingapi.model.ToteStatus;
+import com.rede.stagingapi.model.enums.ToteStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

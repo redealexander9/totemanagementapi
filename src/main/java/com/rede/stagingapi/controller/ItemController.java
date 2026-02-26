@@ -4,6 +4,7 @@ import com.rede.stagingapi.exception.ItemNotFoundException;
 import com.rede.stagingapi.model.ToteItem;
 import com.rede.stagingapi.repository.ItemRepository;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +29,18 @@ public class ItemController {
         return itemRepository.findAll();
     }
     @GetMapping("/{upc}")
-    public ToteItem getItemById(@PathVariable Long upc){
+    public ToteItem getItemById(@PathVariable String upc){
        return itemRepository.findById(upc).orElseThrow(() -> new ItemNotFoundException(upc));
     }
+
+    @DeleteMapping("/{upc}")
+    public ResponseEntity<?> deleteItem(@PathVariable String upc){
+        if(!itemRepository.existsById(upc)){
+            return ResponseEntity.notFound().build();
+        }
+        itemRepository.deleteById(upc);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
