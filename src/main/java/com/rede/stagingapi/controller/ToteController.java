@@ -5,6 +5,8 @@ import com.rede.stagingapi.exception.ItemNotFoundException;
 import com.rede.stagingapi.exception.ToteNotFoundException;
 import com.rede.stagingapi.exception.ToteWarnings;
 import com.rede.stagingapi.model.*;
+import com.rede.stagingapi.model.enums.TempBand;
+import com.rede.stagingapi.model.enums.ToteStatus;
 import com.rede.stagingapi.repository.ItemRepository;
 import com.rede.stagingapi.repository.ToteRepository;
 import jakarta.validation.Valid;
@@ -60,9 +62,12 @@ public class ToteController {
     }
 
     @PostMapping("/{id}/addItem")
-    public Tote addItemToTote(@PathVariable long id, @RequestBody long upc){
+    public Tote addItemToTote(@PathVariable long id, @RequestBody AddItemRequest request){
         Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
-        ToteItem itemToAdd = itemRepository.findById(upc).orElseThrow(() -> new ItemNotFoundException(upc));
+        String upc = request.getUpc();
+
+        logger.info(upc);
+        ToteItem itemToAdd = itemRepository.findById(upc).orElseThrow(() -> new ItemNotFoundException("Item not found"));
         tote.addItem(itemToAdd);
         toteRepository.save(tote);
         return tote;
@@ -123,6 +128,21 @@ public class ToteController {
         return toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
     }
 
+    @GetMapping("/{id}/items")
+    public List<ToteItem> getItemsInTote(@PathVariable Long id) {
+        Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
+        return tote.getItems();
+    }
+
+    @GetMapping("/items")
+    public List<ToteItem> getAllItems(){
+        return itemRepository.findAll();
+    }
+
+    @GetMapping("/items/{id}")
+    public ToteItem getItem(@PathVariable String id){
+        return itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(id));
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTote(@PathVariable Long id){
         if(!toteRepository.existsById(id)){

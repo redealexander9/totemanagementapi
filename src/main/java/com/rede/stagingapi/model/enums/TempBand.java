@@ -1,4 +1,4 @@
-package com.rede.stagingapi.model;
+package com.rede.stagingapi.model.enums;
 
 public enum TempBand {
     AMBIENT,

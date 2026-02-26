@@ -1,4 +1,7 @@
 package com.rede.stagingapi.model;
+import com.rede.stagingapi.model.enums.OrderType;
+import com.rede.stagingapi.model.enums.TempBand;
+import com.rede.stagingapi.model.enums.ToteStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -25,11 +28,12 @@ public class Tote {
     @Enumerated(EnumType.STRING)
     private ToteStatus status; // Picking, Unstaged, Staged, Returned
     private String location; // Ambient 1, Chilled 2, Frozen 3, Hot Case...
-
+    private OrderType type; // Pickup, Delivery, GMD
     private LocalDateTime toteCreatedTime;
     private LocalDateTime firstItemPickedAt = null; // For determining cold chain compliance
     private LocalDateTime pickWalkFinishedAt;
     private LocalDateTime pickWalkDueAt;
+    private String tripId;
     private boolean fragile;
     @Pattern(regexp = "^[0-9]{4}$", message = "Code must be 4 digits, each 0-9")
     private String osn;
@@ -37,7 +41,7 @@ public class Tote {
     private List<String> pickerIds = new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "tote",cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ToteItem> items = new ArrayList<>();
     public int getNumItems() {
         return items.size();
