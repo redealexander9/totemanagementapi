@@ -1,4 +1,5 @@
 package com.rede.stagingapi.model;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.rede.stagingapi.model.enums.OrderType;
 import com.rede.stagingapi.model.enums.TempBand;
 import com.rede.stagingapi.model.enums.ToteStatus;
@@ -15,6 +16,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
 @Data
 @Entity
+@JsonPropertyOrder({"id", "temp", "status", "location", "type", "toteCreatedTime"})
 public class Tote {
 
     @Id
