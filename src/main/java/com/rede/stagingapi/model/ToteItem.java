@@ -1,6 +1,7 @@
 package com.rede.stagingapi.model;
 
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.rede.stagingapi.model.enums.TempBand;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 
 @Data
 @Entity
+@JsonPropertyOrder({"upc","aisle", "sectionNum", "tagNum", "itemTemp", "quantityOrdered", "quantityPicked", "isOversized", "isFragile"})
 public class ToteItem {
 
     @Id

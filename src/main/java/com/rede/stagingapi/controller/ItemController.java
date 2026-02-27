@@ -28,6 +28,8 @@ public class ItemController {
     public List<ToteItem> getAllItems(){
         return itemRepository.findAll();
     }
+
+
     @GetMapping("/{upc}")
     public ToteItem getItemById(@PathVariable String upc){
        return itemRepository.findById(upc).orElseThrow(() -> new ItemNotFoundException(upc));
