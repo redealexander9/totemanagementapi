@@ -9,6 +9,7 @@ public class ErrorResponse {
     @Getter
     private int status;
     private String error;
+    @Getter
     private String message;
 
     public ErrorResponse(int status, String error, String message){
@@ -18,5 +19,4 @@ public class ErrorResponse {
         this.message = message;
     }
     public LocalDateTime getTimeStamp() { return timestamp;}
-
 }

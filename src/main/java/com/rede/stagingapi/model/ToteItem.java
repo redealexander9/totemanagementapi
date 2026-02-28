@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 public class ToteItem {
 
     @Id
-    @Pattern(regexp = "\\d{12}", message="UPC must be exactly 12 digits")
+    @Pattern(regexp = "\\d{12}", message="UPC must be 12 digits")
     private String upc;
 
     private Integer quantityOrdered;
@@ -24,8 +24,9 @@ public class ToteItem {
     private String aisle;
     private Integer sectionNum;
     private Integer tagNum;
+    private String pickerId;
 
-    //private ToteItem substitution;
+
 
     @Column(nullable = false)
     private Boolean isOversized = false;
