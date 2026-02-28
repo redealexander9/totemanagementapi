@@ -9,6 +9,7 @@ import com.rede.stagingapi.model.enums.TempBand;
 import com.rede.stagingapi.model.enums.ToteStatus;
 import com.rede.stagingapi.repository.ItemRepository;
 import com.rede.stagingapi.repository.ToteRepository;
+import com.rede.stagingapi.service.ToteService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,13 +29,16 @@ import java.util.Map;
 public class ToteController {
 
     private final ToteRepository toteRepository;
+    private final ToteService toteService;
 
     private static final Logger logger = LoggerFactory.getLogger(ToteController.class);
     private final ItemRepository itemRepository;
 
-    public ToteController(ToteRepository toteRepository, ItemRepository itemRepository){
+    public ToteController(ToteRepository toteRepository, ToteService toteService, ItemRepository itemRepository){
         this.toteRepository = toteRepository;
+        this.toteService = toteService;
         this.itemRepository = itemRepository;
+
     }
 
     @PostMapping
@@ -52,13 +56,21 @@ public class ToteController {
         return otherOrders.size() >= 2;
     }
     @PostMapping("/{id}/edit")
-    public Tote editTote(@PathVariable long id, @RequestBody Tote editedTote){
+    public Tote editTote(@PathVariable long id, @RequestBody Tote editedTote){  // Currently for testing purposes
         Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
-        int numItems = editedTote.getNumItems();
 
-        //tote.setNumItems(numItems);
+        tote.setStatus(editedTote.getStatus());
         toteRepository.save(tote);
         return tote;
+    }
+
+    @PostMapping("/{id}/addPicker")
+    public ResponseEntity<Tote> addPickerToTote(@PathVariable Long id, @RequestBody AddPickerRequest request){
+        Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
+        String pickerId = request.getPickerId();
+        tote.addPickerId(pickerId);
+        toteRepository.save(tote);
+        return ResponseEntity.ok(tote);
     }
 
     @PostMapping("/{id}/addItem")
@@ -86,7 +98,7 @@ public class ToteController {
         if(firstItemPickedAt != null){
             duration = Duration.between(firstItemPickedAt, LocalDateTime.now());
         }
-        if(temp == TempBand.CHILLED && duration != null && duration.toHours() >= 1){
+        if(temp == TempBand.CHILLED && duration != null && duration.toHours() >= 1){ // Chilled tote is being staged more than 1 hour after the first item was picked
             warnings.add(ToteWarnings.BROKEN_COLD_CHAIN);
         }
         if (tote.getNumItems() == 0) {
@@ -134,9 +146,13 @@ public class ToteController {
         return tote.getItems();
     }
 
-    @GetMapping("/items")
-    public List<ToteItem> getAllItems(){
-        return itemRepository.findAll();
+    @PostMapping("/{targetId}/consolidate/{sourceId}")
+    public ResponseEntity<Tote> consolidateTotes(@PathVariable Long targetId, @PathVariable Long sourceId){
+
+        Tote updated = toteService.consolidate(targetId, sourceId);
+        return ResponseEntity.ok(updated);
+
+
     }
 
     @GetMapping("/items/{id}")
