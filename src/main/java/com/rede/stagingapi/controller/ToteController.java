@@ -49,7 +49,6 @@ public class ToteController {
 
     public boolean locationFull(String location, String osn){   // Checks if location has 2 or more orders that don't match tote being staged
         List<Tote> stagedTotes = toteRepository.findByStatusAndLocation(ToteStatus.STAGED, location);
-        logger.info("stink");
         logger.info(location);
         List<Tote> otherOrders = stagedTotes.stream()
                 .filter(t -> !t.getOsn().equals(osn))
