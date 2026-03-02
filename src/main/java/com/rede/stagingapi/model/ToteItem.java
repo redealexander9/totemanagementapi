@@ -2,12 +2,9 @@ package com.rede.stagingapi.model;
 
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.rede.stagingapi.model.enums.TempBand;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
-import java.math.BigDecimal;
 
 @Data
 @Entity

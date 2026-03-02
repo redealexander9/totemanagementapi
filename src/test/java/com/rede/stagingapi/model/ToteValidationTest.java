@@ -1,5 +1,5 @@
 package com.rede.stagingapi.model;
-import com.rede.stagingapi.model.Tote;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,12 +11,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Set;
 
 public class ToteValidationTest {
-    private Validator validator;
+    private static Validator validator;
+    private static ValidatorFactory factory;
 
     @BeforeEach
     void setup(){
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+    }
+
+    @AfterAll
+    static void tearDownAll(){
+        if(factory != null){
+            factory.close();
+        }
     }
 
     @Test

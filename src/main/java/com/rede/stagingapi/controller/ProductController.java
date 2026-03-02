@@ -1,12 +1,9 @@
 package com.rede.stagingapi.controller;
-import com.rede.stagingapi.exception.ItemNotFoundException;
 import com.rede.stagingapi.exception.ProductNotFoundException;
 import com.rede.stagingapi.model.Product;
-import com.rede.stagingapi.model.ToteItem;
-import com.rede.stagingapi.repository.ItemRepository;
+import com.rede.stagingapi.model.ShelfLocation;
 import com.rede.stagingapi.repository.ProductRepository;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,5 +31,11 @@ public class ProductController {
     @GetMapping("/{upc}")
     public Product getProduct(@PathVariable String upc){
         return productRepository.findById(upc).orElseThrow(() -> new ProductNotFoundException("Product has not been created yet"));
+    }
+
+    @GetMapping("/{upc}/location")
+    public ShelfLocation getLocationByProduct(@PathVariable String upc){
+        Product product = productRepository.findById(upc).orElseThrow(() -> new ProductNotFoundException("Product has not been created yet"));
+        return product.getLocation();
     }
 }
