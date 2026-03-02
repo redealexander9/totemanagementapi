@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 public class ErrorResponse {
-    private LocalDateTime timestamp;
+    private final LocalDateTime timestamp;
     @Getter
     private int status;
     private String error;
@@ -18,5 +18,4 @@ public class ErrorResponse {
         this.error = error;
         this.message = message;
     }
-    public LocalDateTime getTimeStamp() { return timestamp;}
 }
