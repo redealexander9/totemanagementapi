@@ -11,28 +11,22 @@ import java.math.BigDecimal;
 
 @Data
 @Entity
-@JsonPropertyOrder({"upc","aisle", "sectionNum", "tagNum", "itemTemp", "quantityOrdered", "quantityPicked", "isOversized", "isFragile"})
+@JsonPropertyOrder({"id","product","tote","quantityOrdered","quantityPicked"})
 public class ToteItem {
 
+
     @Id
-    @Pattern(regexp = "\\d{12}", message="UPC must be 12 digits")
-    private String upc;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    private Product product;
+
+    @ManyToOne
+    private Tote tote;
 
     private Integer quantityOrdered;
     private Integer quantityPicked;
-    private TempBand itemTemp;
-    private String aisle;
-    private Integer sectionNum;
-    private Integer tagNum;
-    private String pickerId;
-
-
-
-    @Column(nullable = false)
-    private Boolean isOversized = false;
-    @Column(nullable = false)
-    private Boolean isFragile = false;
-
 
 
 }

@@ -46,6 +46,7 @@ public class ToteController {
         tote.setStatus(ToteStatus.PICKING);
         return toteRepository.save(tote);
     }
+
     public boolean locationFull(String location, String osn){   // Checks if location has 2 or more orders that don't match tote being staged
         List<Tote> stagedTotes = toteRepository.findByStatusAndLocation(ToteStatus.STAGED, location);
         logger.info("stink");
@@ -55,6 +56,7 @@ public class ToteController {
                 .toList();
         return otherOrders.size() >= 2;
     }
+
     @PostMapping("/{id}/edit")
     public Tote editTote(@PathVariable long id, @RequestBody Tote editedTote){  // Currently for testing purposes
         Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
@@ -65,25 +67,23 @@ public class ToteController {
     }
 
     @PostMapping("/{id}/addPicker")
-    public ResponseEntity<Tote> addPickerToTote(@PathVariable Long id, @RequestBody AddPickerRequest request){
+    public ResponseEntity<Tote> addPickerToTote(@PathVariable Long id, @RequestBody String pickerId){
         Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
-        String pickerId = request.getPickerId();
         tote.addPickerId(pickerId);
         toteRepository.save(tote);
         return ResponseEntity.ok(tote);
     }
 
     @PostMapping("/{id}/addItem")
-    public Tote addItemToTote(@PathVariable long id, @RequestBody AddItemRequest request){
+    public Tote addItemToTote(@PathVariable long id, @RequestBody Long itemId){
         Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
-        String upc = request.getUpc();
 
-        logger.info(upc);
-        ToteItem itemToAdd = itemRepository.findById(upc).orElseThrow(() -> new ItemNotFoundException("Item not found"));
+        ToteItem itemToAdd = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("Item not found"));
         tote.addItem(itemToAdd);
         toteRepository.save(tote);
         return tote;
     }
+
     @PostMapping("/{id}/stage")
     public ResponseEntity<?> stageTote(@PathVariable Long id, @RequestBody StageToteRequest request){
         Tote tote = toteRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tote not found"));
@@ -95,6 +95,7 @@ public class ToteController {
         List<ToteWarnings> warnings = new ArrayList<>();
         LocalDateTime firstItemPickedAt = tote.getFirstItemPickedAt();
         Duration duration = null;
+
         if(firstItemPickedAt != null){
             duration = Duration.between(firstItemPickedAt, LocalDateTime.now());
         }
@@ -110,6 +111,7 @@ public class ToteController {
         if(locationFull(stagingLocation, osn)){
             warnings.add(ToteWarnings.LOCATION_FULL);
         }
+
         if(!warnings.isEmpty() && !confirm){
             return ResponseEntity.ok(Map.of(
                     "warnings", warnings,
@@ -130,6 +132,15 @@ public class ToteController {
 
     }
 
+    @PostMapping("/{targetId}/consolidate/{sourceId}")
+    public ResponseEntity<Tote> consolidateTotes(@PathVariable Long targetId, @PathVariable Long sourceId){
+
+        Tote updated = toteService.consolidate(targetId, sourceId);
+        return ResponseEntity.ok(updated);
+
+
+    }
+
     @GetMapping     // Handle GET request
     public List<Tote> getAllTotes(){
         return toteRepository.findAll();
@@ -146,19 +157,8 @@ public class ToteController {
         return tote.getItems();
     }
 
-    @PostMapping("/{targetId}/consolidate/{sourceId}")
-    public ResponseEntity<Tote> consolidateTotes(@PathVariable Long targetId, @PathVariable Long sourceId){
-
-        Tote updated = toteService.consolidate(targetId, sourceId);
-        return ResponseEntity.ok(updated);
 
 
-    }
-
-    @GetMapping("/items/{id}")
-    public ToteItem getItem(@PathVariable String id){
-        return itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(id));
-    }
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTote(@PathVariable Long id){
         if(!toteRepository.existsById(id)){

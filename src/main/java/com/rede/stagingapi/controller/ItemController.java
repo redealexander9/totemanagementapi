@@ -30,17 +30,17 @@ public class ItemController {
     }
 
 
-    @GetMapping("/{upc}")
-    public ToteItem getItemById(@PathVariable String upc){
-       return itemRepository.findById(upc).orElseThrow(() -> new ItemNotFoundException(upc));
+    @GetMapping("/{id}")
+    public ToteItem getItemById(@PathVariable Long id){
+       return itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException(id));
     }
 
-    @DeleteMapping("/{upc}")
-    public ResponseEntity<?> deleteItem(@PathVariable String upc){
-        if(!itemRepository.existsById(upc)){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteItem(@PathVariable Long id){
+        if(!itemRepository.existsById(id)){
             return ResponseEntity.notFound().build();
         }
-        itemRepository.deleteById(upc);
+        itemRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 

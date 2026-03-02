@@ -25,8 +25,8 @@ public class Tote {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Temperature band required")
-    private TempBand temp; // Ambient, Chilled, Frozen, Hot, Unknown
+    @Column(nullable = false)
+    private TempBand temp = TempBand.UNKNOWN; // Ambient, Chilled, Frozen, Hot, Unknown
 
     @Enumerated(EnumType.STRING)
     private ToteStatus status; // Picking, Unstaged, Staged, Returned
@@ -38,7 +38,7 @@ public class Tote {
     private LocalDateTime pickWalkDueAt;
     private String tripId;
     private boolean fragile;
-    @Pattern(regexp = "^[0-9]{4}$", message = "Code must be 4 digits, each 0-9")
+    @Pattern(regexp = "^[0-9]{4}$", message = "OSN must be 4 digits, each 0-9")
     private String osn;
     private String orderNumber;
     private List<String> pickerIds = new ArrayList<>();
