@@ -5,7 +5,6 @@ import com.rede.stagingapi.model.enums.OrderType;
 import com.rede.stagingapi.model.enums.TempBand;
 import com.rede.stagingapi.model.enums.ToteStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
@@ -36,12 +35,13 @@ public class Tote {
     private LocalDateTime firstItemPickedAt = null; // For determining cold chain compliance
     private LocalDateTime pickWalkFinishedAt;
     private LocalDateTime pickWalkDueAt;
-    private String tripId;
+    private String batchId;
     private boolean fragile;
     @Pattern(regexp = "^[0-9]{4}$", message = "OSN must be 4 digits, each 0-9")
     private String osn;
     private String orderNumber;
-    private List<String> pickerIds = new ArrayList<>();
+    @ElementCollection
+    private List<String> shopperIds = new ArrayList<>();
 
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -52,7 +52,7 @@ public class Tote {
 
 
     public Tote(){
-        this.pickerIds = new ArrayList<>();
+        this.shopperIds = new ArrayList<>();
     }
     @PrePersist
     protected void onCreate(){
@@ -67,10 +67,10 @@ public class Tote {
     }
 
     public void addPickerId(String pickerId){
-        if(this.pickerIds == null){
-            pickerIds = new ArrayList<>();
+        if(this.shopperIds == null){
+            shopperIds = new ArrayList<>();
         }
-        pickerIds.add(pickerId);
+        shopperIds.add(pickerId);
 
     }
 
@@ -87,7 +87,7 @@ public class Tote {
         source.location = "Ambient 1";  // Stage tote to keep it from affecting tote staging stats
         source.status = ToteStatus.STAGED;
         this.items.addAll(source.getItems());
-        this.pickerIds.addAll(source.getPickerIds());
+        this.shopperIds.addAll(source.getShopperIds());
         source.items.clear();
     }
 }

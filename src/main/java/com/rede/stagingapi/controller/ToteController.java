@@ -131,6 +131,8 @@ public class ToteController {
 
     }
 
+
+
     @PostMapping("/{targetId}/consolidate/{sourceId}")
     public ResponseEntity<Tote> consolidateTotes(@PathVariable Long targetId, @PathVariable Long sourceId){
 
@@ -154,6 +156,16 @@ public class ToteController {
     public List<ToteItem> getItemsInTote(@PathVariable Long id) {
         Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
         return tote.getItems();
+    }
+
+    @GetMapping("/unstaged")
+    public List<Tote> getAllUnstaged(){
+        return toteRepository.findAllUnstaged();
+    }
+
+    @GetMapping("/unstaged/{shopperId}")
+    public List<Tote> getUnstagedByPicker(@PathVariable String shopperId){
+        return toteRepository.findUnstagedByPickerId(shopperId);
     }
 
 
