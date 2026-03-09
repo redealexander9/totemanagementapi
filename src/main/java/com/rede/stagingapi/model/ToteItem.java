@@ -22,8 +22,23 @@ public class ToteItem {
     @ManyToOne
     private Tote tote;
 
-    private Integer quantityOrdered;
-    private Integer quantityPicked;
+    private Integer quantityOrdered = 0;
+    private Integer quantityPicked = 0;
 
+    public ToteItem() {
+
+    }
+
+    public String getUpc(){
+        return product.getUpc();
+    }
+
+
+    public ToteItem(String upc){
+        if(product == null){
+            product = new Product();
+        }
+        product.setUpc(upc);
+    }
 
 }
