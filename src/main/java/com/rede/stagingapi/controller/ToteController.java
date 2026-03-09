@@ -51,7 +51,7 @@ public class ToteController {
         List<Tote> stagedTotes = toteRepository.findByStatusAndLocation(ToteStatus.STAGED, location);
         logger.info(location);
         List<Tote> otherOrders = stagedTotes.stream()
-                .filter(t -> !t.getOsn().equals(osn))
+                .filter(t -> !t.getSequenceNumber().equals(osn))
                 .toList();
         return otherOrders.size() >= 2;
     }
@@ -68,7 +68,7 @@ public class ToteController {
     @PostMapping("/{id}/addPicker")
     public ResponseEntity<Tote> addPickerToTote(@PathVariable Long id, @RequestBody String pickerId){
         Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
-        tote.addPickerId(pickerId);
+        tote.addShopperId(pickerId);
         toteRepository.save(tote);
         return ResponseEntity.ok(tote);
     }
@@ -89,7 +89,7 @@ public class ToteController {
         String stagingLocation = request.getLocation();
 
         TempBand temp = tote.getTemp();
-        String osn = tote.getOsn();
+        String osn = tote.getSequenceNumber();
         Boolean confirm = request.getConfirm();
         List<ToteWarnings> warnings = new ArrayList<>();
         LocalDateTime firstItemPickedAt = tote.getFirstItemPickedAt();

@@ -1,6 +1,6 @@
 package com.rede.stagingapi.model;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.rede.stagingapi.exception.ToteNotFoundException;
+import com.rede.stagingapi.exception.ToteMergeException;
 import com.rede.stagingapi.model.enums.OrderType;
 import com.rede.stagingapi.model.enums.TempBand;
 import com.rede.stagingapi.model.enums.ToteStatus;
@@ -16,7 +16,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
 @Data
 @Entity
-@JsonPropertyOrder({"id","osn","orderNumber","pickerIds", "temp", "status", "location", "type", "toteCreatedTime"})
+@JsonPropertyOrder({"id","osn","orderNumber","shopperIds", "temp", "status", "location", "type", "toteCreatedTime"})
 public class Tote {
 
     @Id
@@ -28,31 +28,40 @@ public class Tote {
     private TempBand temp = TempBand.UNKNOWN; // Ambient, Chilled, Frozen, Hot, Unknown
 
     @Enumerated(EnumType.STRING)
-    private ToteStatus status; // Picking, Unstaged, Staged, Returned
-    private String location; // Ambient 1, Chilled 2, Frozen 3, Hot Case...
-    private OrderType type; // Pickup, Delivery, GMD
+    private ToteStatus status = ToteStatus.PICKING; // Picking, Unstaged, Staged, Returned
+    private String location; // Ambient 1, Chilled 2, Frozen 3...
+    private OrderType type; // Pickup, Delivery
     private LocalDateTime toteCreatedTime;
     private LocalDateTime firstItemPickedAt = null; // For determining cold chain compliance
     private LocalDateTime pickWalkFinishedAt;
     private LocalDateTime pickWalkDueAt;
-    private String batchId;
+    private String batchId; // If delivery orders are batched
     private boolean fragile;
     @Pattern(regexp = "^[0-9]{4}$", message = "OSN must be 4 digits, each 0-9")
-    private String osn;
+    private String sequenceNumber;
     private String orderNumber;
     @ElementCollection
-    private List<String> shopperIds = new ArrayList<>();
-
+    private List<String> shopperIds; // Uses a list so totes can be combined without losing data
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ToteItem> items = new ArrayList<>();
     public int getNumItems() {
+        if(items == null){
+            items = new ArrayList<>();
+        }
         return items.size();
+
     }
 
 
     public Tote(){
         this.shopperIds = new ArrayList<>();
+        toteCreatedTime = LocalDateTime.now();
+    }
+    public Tote(TempBand temp){
+        this.shopperIds = new ArrayList<>();
+        toteCreatedTime = LocalDateTime.now();
+        this.temp = temp;
     }
     @PrePersist
     protected void onCreate(){
@@ -66,27 +75,44 @@ public class Tote {
 
     }
 
-    public void addPickerId(String pickerId){
+    public void addShopperId(String shopperId){
         if(this.shopperIds == null){
             shopperIds = new ArrayList<>();
         }
-        shopperIds.add(pickerId);
+        shopperIds.add(shopperId);
 
     }
 
     public void mergeItemsFrom(Tote source){
-        if(!this.osn.equals(source.osn)){
-            throw new ToteNotFoundException("Totes need to belong to the same order");
+//        System.out.println(source.getSequenceNumber());
+//        System.out.println(this.getSequenceNumber());
+//        System.out.flush();
+        if(this.sequenceNumber != null && source.sequenceNumber != null && !this.sequenceNumber.equals(source.sequenceNumber)){
+            throw new ToteMergeException("Totes need to belong to the same order");
         }
-        if(!this.temp.equals(source.getTemp()) && !source.temp.equals(TempBand.UNKNOWN)){
-            throw new ToteNotFoundException("Totes need to be from the same temperature band");
+        if(this.temp != source.getTemp() && source.getTemp() != TempBand.UNKNOWN){   // Temp bands are different and source temp band is known
+            throw new ToteMergeException("Totes need to be from the same temperature band");
         }
         if(this.status.equals(ToteStatus.PICKING) || source.status.equals(ToteStatus.PICKING)){
-            throw new ToteNotFoundException("Totes cannot have status of: PICKING");
+            throw new ToteMergeException("Totes cannot have status of: PICKING");
         }
         source.location = "Ambient 1";  // Stage tote to keep it from affecting tote staging stats
         source.status = ToteStatus.STAGED;
-        this.items.addAll(source.getItems());
+        for(ToteItem sourceItem : source.getItems()){
+            boolean found = false;
+            for(ToteItem targetItem : this.getItems()){
+                if(targetItem.getUpc().equals(sourceItem.getUpc())){
+                    targetItem.setQuantityOrdered(targetItem.getQuantityOrdered() + sourceItem.getQuantityOrdered());
+                    targetItem.setQuantityPicked(targetItem.getQuantityPicked() + sourceItem.getQuantityPicked());
+                    found = true;
+                    break;
+                }
+            }
+            if(!found){
+                this.addItem(sourceItem);
+            }
+        }
+        //this.items.addAll(source.getItems());
         this.shopperIds.addAll(source.getShopperIds());
         source.items.clear();
     }
