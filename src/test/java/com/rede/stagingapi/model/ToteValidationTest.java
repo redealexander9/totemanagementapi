@@ -30,7 +30,7 @@ public class ToteValidationTest {
     @Test
     void osnMustBe4Digits(){
         Tote tote = new Tote();
-        tote.setOsn("12345");
+        tote.setSequenceNumber("12345");
 
         Set<ConstraintViolation<Tote>> violations = validator.validate(tote);
         assertEquals(1, violations.size());
