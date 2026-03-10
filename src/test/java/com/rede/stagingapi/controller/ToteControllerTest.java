@@ -30,11 +30,11 @@ public class ToteControllerTest {
     @InjectMocks
     private ToteService toteService;
 
-    @Mock
-    private ItemRepository itemRepository;
+//    @Mock
+//    private ItemRepository itemRepository;
 
-    @InjectMocks
-    private ToteController toteController;
+//    @InjectMocks
+//    private ToteController toteController;
 
 
     @Test
@@ -55,7 +55,7 @@ public class ToteControllerTest {
                 .thenReturn(Optional.of(ambientTote));
 
         assertThrows(ToteMergeException.class, () -> {
-           Tote t = toteService.consolidate(1L, 2L);
+           toteService.consolidate(1L, 2L);
         });
     }
     @Test
@@ -70,7 +70,7 @@ public class ToteControllerTest {
         when(toteRepository.findById(2L)).thenReturn(Optional.of(sourceTote));
 
         assertThrows(ToteMergeException.class, () -> {
-            Tote t = toteService.consolidate(1L, 2L);
+            toteService.consolidate(1L, 2L);
         });
 
     }
