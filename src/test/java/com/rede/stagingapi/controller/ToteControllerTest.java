@@ -44,7 +44,7 @@ public class ToteControllerTest {
         chilledTote.setId(1L);
         ambientTote.setId(2L);
         chilledTote.setSequenceNumber("1234");
-        System.out.println(chilledTote.getId());
+
         ToteItem chilledItem = new ToteItem("123456789123");
         ToteItem ambientItem = new ToteItem("123456789124");
         chilledTote.addItem(chilledItem);
@@ -56,6 +56,21 @@ public class ToteControllerTest {
 
         assertThrows(ToteMergeException.class, () -> {
            Tote t = toteService.consolidate(1L, 2L);
+        });
+    }
+    @Test
+    void consolidateTotes_throwsException_whenSequenceNumsDiffer(){
+        Tote targetTote = new Tote();
+        Tote sourceTote = new Tote();
+        targetTote.setSequenceNumber("1234");
+        sourceTote.setSequenceNumber("1235");
+        targetTote.setId(1L);
+        sourceTote.setId(2L);
+        when(toteRepository.findById(1L)).thenReturn(Optional.of(targetTote));
+        when(toteRepository.findById(2L)).thenReturn(Optional.of(sourceTote));
+
+        assertThrows(ToteMergeException.class, () -> {
+            Tote t = toteService.consolidate(1L, 2L);
         });
 
     }
