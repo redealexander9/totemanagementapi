@@ -6,7 +6,6 @@ import com.rede.stagingapi.model.ToteItem;
 import com.rede.stagingapi.model.enums.TempBand;
 import com.rede.stagingapi.model.enums.ToteStatus;
 import com.rede.stagingapi.repository.ToteRepository;
-import com.rede.stagingapi.repository.ItemRepository;
 import com.rede.stagingapi.service.ToteService;
 
 import org.junit.jupiter.api.Test;
@@ -30,11 +29,7 @@ public class ToteControllerTest {
     @InjectMocks
     private ToteService toteService;
 
-//    @Mock
-//    private ItemRepository itemRepository;
 
-//    @InjectMocks
-//    private ToteController toteController;
 
 
     @Test
@@ -54,9 +49,7 @@ public class ToteControllerTest {
         when(toteRepository.findById(2L))
                 .thenReturn(Optional.of(ambientTote));
 
-        assertThrows(ToteMergeException.class, () -> {
-           toteService.consolidate(1L, 2L);
-        });
+        assertThrows(ToteMergeException.class, () -> toteService.consolidate(1L, 2L));
     }
     @Test
     void consolidateTotes_throwsException_whenSequenceNumsDiffer(){
@@ -69,9 +62,7 @@ public class ToteControllerTest {
         when(toteRepository.findById(1L)).thenReturn(Optional.of(targetTote));
         when(toteRepository.findById(2L)).thenReturn(Optional.of(sourceTote));
 
-        assertThrows(ToteMergeException.class, () -> {
-            toteService.consolidate(1L, 2L);
-        });
+        assertThrows(ToteMergeException.class, () -> toteService.consolidate(1L, 2L));
 
     }
 
