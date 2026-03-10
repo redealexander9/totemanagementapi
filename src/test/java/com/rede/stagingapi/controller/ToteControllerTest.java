@@ -29,9 +29,6 @@ public class ToteControllerTest {
     @InjectMocks
     private ToteService toteService;
 
-
-
-
     @Test
     void consolidateTotes_throwsException_whenTempBandsDiffer(){
         Tote chilledTote = new Tote(TempBand.CHILLED);
@@ -63,6 +60,26 @@ public class ToteControllerTest {
         when(toteRepository.findById(2L)).thenReturn(Optional.of(sourceTote));
 
         assertThrows(ToteMergeException.class, () -> toteService.consolidate(1L, 2L));
+    }
+
+    @Test
+    void consolidateTotes_throwsException_whenStatusPicking(){
+        Tote targetTote = new Tote();
+        Tote sourceTote = new Tote();
+        targetTote.setStatus(ToteStatus.PICKING);
+        sourceTote.setStatus(ToteStatus.PICKING);
+        targetTote.setId(1L);
+        sourceTote.setId(2L);
+        when(toteRepository.findById(1L)).thenReturn(Optional.of(targetTote));
+        when(toteRepository.findById(2L)).thenReturn(Optional.of(sourceTote));
+
+        assertThrows(ToteMergeException.class, () -> toteService.consolidate(1L, 2L));
+        sourceTote.setStatus(ToteStatus.STAGED);
+        assertThrows(ToteMergeException.class, () -> toteService.consolidate(1L, 2L));
+        targetTote.setStatus(ToteStatus.STAGED);
+        sourceTote.setStatus(ToteStatus.PICKING);
+        assertThrows(ToteMergeException.class, () -> toteService.consolidate(1L, 2L));
+
 
     }
 

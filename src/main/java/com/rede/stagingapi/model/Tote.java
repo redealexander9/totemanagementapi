@@ -84,9 +84,6 @@ public class Tote {
     }
 
     public void mergeItemsFrom(Tote source){
-//        System.out.println(source.getSequenceNumber());
-//        System.out.println(this.getSequenceNumber());
-//        System.out.flush();
         if(this.sequenceNumber != null && source.sequenceNumber != null && !this.sequenceNumber.equals(source.sequenceNumber)){
             throw new ToteMergeException("Totes need to belong to the same order");
         }
