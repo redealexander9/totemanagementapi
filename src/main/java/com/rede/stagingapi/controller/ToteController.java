@@ -78,6 +78,7 @@ public class ToteController {
         Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
 
         ToteItem itemToAdd = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("Item not found"));
+
         tote.addItem(itemToAdd);
         toteRepository.save(tote);
         return tote;

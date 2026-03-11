@@ -43,7 +43,7 @@ public class Tote {
     @ElementCollection
     private List<String> shopperIds; // Uses a list so totes can be combined without losing data
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "tote", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ToteItem> items = new ArrayList<>();
     public int getNumItems() {
         if(items == null){
@@ -67,6 +67,8 @@ public class Tote {
     protected void onCreate(){
         this.toteCreatedTime = LocalDateTime.now();
     }
+
+
     public void addItem(ToteItem item){
         if(getNumItems() == 0){
             firstItemPickedAt = LocalDateTime.now();

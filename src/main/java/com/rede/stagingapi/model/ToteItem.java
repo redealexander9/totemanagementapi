@@ -17,9 +17,11 @@ public class ToteItem {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "product_id")
     private Product product;
 
     @ManyToOne
+    @JoinColumn(name = "tote_id")
     private Tote tote;
 
     private Integer quantityOrdered = 0;
@@ -29,8 +31,14 @@ public class ToteItem {
 
     }
 
+
+
     public String getUpc(){
+        if(this.product != null){
+
         return product.getUpc();
+        }
+        return "";
     }
 
 

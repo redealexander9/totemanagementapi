@@ -12,7 +12,7 @@ import lombok.Data;
 public class Product {
     @Id
     private String upc;
-    private TempBand temp;
+    private TempBand tempBand;
     private String name;
     private double weight;
 
