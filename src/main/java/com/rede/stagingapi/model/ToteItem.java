@@ -31,7 +31,9 @@ public class ToteItem {
 
     }
 
-
+    public void assignTote(Tote tote){
+        this.tote = tote;
+    }
 
     public String getUpc(){
         if(this.product != null){

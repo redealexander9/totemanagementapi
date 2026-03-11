@@ -80,7 +80,9 @@ public class ToteController {
         ToteItem itemToAdd = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("Item not found"));
 
         tote.addItem(itemToAdd);
+        itemToAdd.assignTote(tote);
         toteRepository.save(tote);
+        itemRepository.save(itemToAdd);
         return tote;
     }
 
