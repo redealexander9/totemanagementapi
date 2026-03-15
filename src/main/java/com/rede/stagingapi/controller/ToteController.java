@@ -212,4 +212,14 @@ public class ToteController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{id}/{itemId}")
+    public Tote removeItemFromTote(@PathVariable Long id, @PathVariable Long itemId){
+        Tote tote = toteRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tote not found"));
+        ToteItem item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException(itemId));
+        tote.getItems().remove(item);
+        item.setTote(null);
+        toteRepository.save(tote);
+        return tote;
+    }
+
 }
