@@ -36,7 +36,7 @@ public class Tote {
     private LocalDateTime pickWalkFinishedAt;
     private LocalDateTime pickWalkDueAt;
     private String batchId; // If delivery orders are batched
-    private boolean fragile;
+    private Boolean isFragile;
     @Pattern(regexp = "^[0-9]{4}$", message = "OSN must be 4 digits, each 0-9")
     private String sequenceNumber;
     private String orderNumber;

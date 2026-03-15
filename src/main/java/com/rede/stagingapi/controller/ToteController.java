@@ -56,15 +56,6 @@ public class ToteController {
         return otherOrders.size() >= 2;
     }
 
-    @PostMapping("/{id}/edit")
-    public Tote editTote(@PathVariable long id, @RequestBody Tote editedTote){  // Currently for testing purposes
-        Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
-
-        tote.setStatus(editedTote.getStatus());
-        toteRepository.save(tote);
-        return tote;
-    }
-
     @PostMapping("/{id}/addPicker")
     public ResponseEntity<Tote> addPickerToTote(@PathVariable Long id, @RequestBody String pickerId){
         Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
@@ -144,6 +135,45 @@ public class ToteController {
 
 
     }
+
+    @PatchMapping("{id}/editTote")
+    public Tote editTote(@PathVariable Long id, @RequestBody ToteUpdateRequest updateRequest){
+        Tote tote = toteRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tote not found"));
+        if(updateRequest.getTemp() != null){
+            tote.setTemp(updateRequest.getTemp());
+        }
+        if(updateRequest.getLocation() != null){
+            tote.setLocation(updateRequest.getLocation());
+        }
+        if(updateRequest.getType() != null){
+            tote.setType(updateRequest.getType());
+        }
+        if(updateRequest.getFirstItemPickedAt() != null){
+            tote.setFirstItemPickedAt(updateRequest.getFirstItemPickedAt());
+        }
+        if(updateRequest.getPickWalkFinishedAt() != null){
+            tote.setPickWalkFinishedAt(updateRequest.getPickWalkFinishedAt());
+        }
+        if(updateRequest.getPickWalkDueAt() != null){
+            tote.setPickWalkDueAt(updateRequest.getPickWalkDueAt());
+        }
+        if(updateRequest.getBatchId() != null){
+            tote.setBatchId(updateRequest.getBatchId());
+        }
+        if(updateRequest.getIsFragile() != null){
+            tote.setIsFragile(updateRequest.getIsFragile());
+        }
+        if(updateRequest.getSequenceNumber() != null){
+            tote.setSequenceNumber(updateRequest.getSequenceNumber());
+        }
+        if(updateRequest.getOrderNumber() != null){
+            tote.setOrderNumber(updateRequest.getOrderNumber());
+        }
+        toteRepository.save(tote);
+        return tote;
+    }
+
+
 
     @GetMapping     // Handle GET request
     public List<Tote> getAllTotes(){

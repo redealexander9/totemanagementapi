@@ -34,7 +34,7 @@ public class ProductController {
     }
 
     @GetMapping("/{upc}/location")
-    public ShelfLocation getLocationByProduct(@PathVariable String upc){
+    public ShelfLocation getLocationOfProduct(@PathVariable String upc){
         Product product = productRepository.findById(upc).orElseThrow(() -> new ProductNotFoundException("Product has not been created yet"));
         return product.getLocation();
     }
