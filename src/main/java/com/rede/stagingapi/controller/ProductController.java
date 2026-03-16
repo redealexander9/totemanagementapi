@@ -4,6 +4,7 @@ import com.rede.stagingapi.model.Product;
 import com.rede.stagingapi.model.ShelfLocation;
 import com.rede.stagingapi.repository.ProductRepository;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,5 +38,14 @@ public class ProductController {
     public ShelfLocation getLocationOfProduct(@PathVariable String upc){
         Product product = productRepository.findById(upc).orElseThrow(() -> new ProductNotFoundException("Product has not been created yet"));
         return product.getLocation();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteProductById(@PathVariable String id){
+        if(!productRepository.existsById(id)){
+            return ResponseEntity.notFound().build();
+        }
+        productRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

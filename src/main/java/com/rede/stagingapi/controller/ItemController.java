@@ -2,8 +2,6 @@ package com.rede.stagingapi.controller;
 
 import com.rede.stagingapi.exception.CreateItemException;
 import com.rede.stagingapi.exception.ItemNotFoundException;
-import com.rede.stagingapi.exception.ItemNotInSourceToteException;
-import com.rede.stagingapi.model.Product;
 import com.rede.stagingapi.model.ToteItem;
 import com.rede.stagingapi.repository.ItemRepository;
 import com.rede.stagingapi.repository.ProductRepository;

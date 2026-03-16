@@ -131,6 +131,7 @@ The API will be available at `http://localhost:8080`
 | GET    | `/totes/unstaged`                          | Get all Unstaged Totes              |
 | GET    | `/totes/unstaged/{shopperId}`              | Get all Unstaged Totes by shopperId |
 | PATCH  | `/totes/{id}/editTote`                     | Edit Tote                           |
+| PATCH  | `/totes/{sourceId}/moveTo/{targetId}`      | Move items to different Tote        |
 | DELETE | `/totes/{toteId}`                          | Delete Tote                         |
 
 ## ToteItem Endpoints
@@ -148,3 +149,4 @@ The API will be available at `http://localhost:8080`
 | GET    | `/products`               | Get all Products        |
 | GET    | `/products/{id}`          | Get Product by id       |
 | GET    | `/products/{id}/location` | Get Location of Product |
+| DELETE | `/products/{id}`          | Delete product by id    |
