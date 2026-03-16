@@ -221,8 +221,8 @@ public class ToteController {
     }
 
     @GetMapping("/unstaged/{shopperId}")
-    public List<Tote> getUnstagedByPicker(@PathVariable String shopperId){
-        return toteRepository.findUnstagedByPickerId(shopperId);
+    public List<Tote> getUnstagedByShopperId(@PathVariable String shopperId){
+        return toteRepository.findUnstagedByShopperId(shopperId);
     }
 
 

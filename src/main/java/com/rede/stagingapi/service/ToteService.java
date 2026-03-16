@@ -18,8 +18,6 @@ public class ToteService {
     public Tote consolidate(Long targetId, Long sourceId){
         Tote target = toteRepository.findById(targetId).orElseThrow(() -> new ToteNotFoundException(targetId));
         Tote source = toteRepository.findById(sourceId).orElseThrow(() -> new ToteNotFoundException(sourceId));
-        System.out.println(target.getStatus().toString());
-        System.out.println(source.getStatus().toString());
         source.setLocation(target.getLocation());   // Set location of source tote to keep it from affecting staging stats
         target.mergeItemsFrom(source);
         source.setStatus(ToteStatus.STAGED);

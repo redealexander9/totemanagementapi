@@ -15,7 +15,7 @@ List<Tote> findByStatusAndLocation(ToteStatus status, String location);
     List<Tote> findByLocationAndTrip(@Param("tripId") String tripId, @Param("location") String location);
 
 @Query("SELECT t FROM Tote t JOIN t.shopperIds i " + "WHERE i = :shopperId AND t.status = 'UNSTAGED'")
-    List<Tote> findUnstagedByPickerId(@Param("pickerId") String pickerId);
+    List<Tote> findUnstagedByShopperId(@Param("pickerId") String pickerId);
 
 @Query("SELECT t FROM Tote t WHERE t.status = 'UNSTAGED'")
     List<Tote> findAllUnstaged();
