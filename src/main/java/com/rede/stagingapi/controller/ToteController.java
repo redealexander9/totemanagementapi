@@ -225,6 +225,10 @@ public class ToteController {
         return toteRepository.findUnstagedByShopperId(shopperId);
     }
 
+    @GetMapping("/{location}/{tripId}")
+    public List<Tote> getTotesByLocationAndTrip(@PathVariable String location, @PathVariable String tripId){
+        return toteRepository.findByLocationAndTrip(tripId, location);
+    }
 
 
     @DeleteMapping("/{id}")

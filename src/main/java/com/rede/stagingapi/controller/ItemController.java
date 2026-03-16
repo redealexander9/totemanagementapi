@@ -1,8 +1,12 @@
 package com.rede.stagingapi.controller;
 
+import com.rede.stagingapi.exception.CreateItemException;
 import com.rede.stagingapi.exception.ItemNotFoundException;
+import com.rede.stagingapi.exception.ItemNotInSourceToteException;
+import com.rede.stagingapi.model.Product;
 import com.rede.stagingapi.model.ToteItem;
 import com.rede.stagingapi.repository.ItemRepository;
+import com.rede.stagingapi.repository.ProductRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +18,20 @@ import java.util.List;
 public class ItemController {
 
     private final ItemRepository itemRepository;
+    private final ProductRepository productRepository;
 
-    public ItemController(ItemRepository itemRepository) {
+    public ItemController(ItemRepository itemRepository, ProductRepository productRepository) {
         this.itemRepository = itemRepository;
+        this.productRepository = productRepository;
     }
 
     @PostMapping
     public ToteItem createItem(@Valid @RequestBody ToteItem item){
+        String upc = item.getUpc();
+        if(upc == null){
+            throw new CreateItemException("UPC cannot be null");
+        }
+        productRepository.findById(upc).orElseThrow(() -> new ItemNotFoundException(upc));
         return itemRepository.save(item);
     }
 
