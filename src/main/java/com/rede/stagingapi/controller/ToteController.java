@@ -64,16 +64,14 @@ public class ToteController {
         return ResponseEntity.ok(tote);
     }
 
-    @PostMapping("/{id}/addItem")
-    public Tote addItemToTote(@PathVariable long id, @RequestBody Long itemId){
+    @PostMapping("/{id}/addItem/{itemId}")
+    public Tote addItemToTote(@PathVariable long id, @PathVariable Long itemId){
         Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
 
+        System.out.println(tote);
         ToteItem itemToAdd = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("Item not found"));
-
         tote.addItem(itemToAdd);
-        itemToAdd.assignTote(tote);
         toteRepository.save(tote);
-        itemRepository.save(itemToAdd);
         return tote;
     }
 

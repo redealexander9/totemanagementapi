@@ -74,6 +74,7 @@ public class Tote {
             firstItemPickedAt = LocalDateTime.now();
         }
         items.add(item);
+        item.setTote(this);
 
     }
 

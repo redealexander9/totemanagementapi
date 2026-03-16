@@ -1,6 +1,7 @@
 package com.rede.stagingapi.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class ToteItem {
 
     @ManyToOne
     @JoinColumn(name = "tote_id")
+    @JsonIgnore
     private Tote tote;
 
     private Integer quantityOrdered = 0;
