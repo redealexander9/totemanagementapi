@@ -18,7 +18,7 @@ public class ToteItem {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", referencedColumnName = "upc")
     private Product product;
 
     @ManyToOne
@@ -31,10 +31,6 @@ public class ToteItem {
 
     public ToteItem() {
 
-    }
-
-    public void assignTote(Tote tote){
-        this.tote = tote;
     }
 
     public String getUpc(){

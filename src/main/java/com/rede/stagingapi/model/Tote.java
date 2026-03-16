@@ -1,6 +1,7 @@
 package com.rede.stagingapi.model;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.rede.stagingapi.exception.ToteMergeException;
+import com.rede.stagingapi.model.enums.ItemMoveStatus;
 import com.rede.stagingapi.model.enums.OrderType;
 import com.rede.stagingapi.model.enums.TempBand;
 import com.rede.stagingapi.model.enums.ToteStatus;
@@ -76,6 +77,17 @@ public class Tote {
         items.add(item);
         item.setTote(this);
 
+    }
+    public ItemMoveStatus addItemFromTote(ToteItem item){
+        for(ToteItem currItem : this.getItems()){
+            if(currItem.getUpc().equals(item.getUpc())){
+                currItem.setQuantityOrdered(currItem.getQuantityOrdered() + item.getQuantityOrdered());
+                currItem.setQuantityPicked(currItem.getQuantityPicked() + item.getQuantityPicked());
+                return ItemMoveStatus.MERGED;
+            }
+        }
+        addItem(item);
+        return ItemMoveStatus.MOVED;
     }
 
     public void addShopperId(String shopperId){

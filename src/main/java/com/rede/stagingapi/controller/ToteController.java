@@ -2,9 +2,11 @@ package com.rede.stagingapi.controller;
 
 
 import com.rede.stagingapi.exception.ItemNotFoundException;
+import com.rede.stagingapi.exception.ItemNotInSourceToteException;
 import com.rede.stagingapi.exception.ToteNotFoundException;
 import com.rede.stagingapi.exception.ToteWarnings;
 import com.rede.stagingapi.model.*;
+import com.rede.stagingapi.model.enums.ItemMoveStatus;
 import com.rede.stagingapi.model.enums.TempBand;
 import com.rede.stagingapi.model.enums.ToteStatus;
 import com.rede.stagingapi.repository.ItemRepository;
@@ -77,7 +79,7 @@ public class ToteController {
 
     @PostMapping("/{id}/stage")
     public ResponseEntity<?> stageTote(@PathVariable Long id, @RequestBody StageToteRequest request){
-        Tote tote = toteRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tote not found"));
+        Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
         String stagingLocation = request.getLocation();
 
         TempBand temp = tote.getTemp();
@@ -134,9 +136,33 @@ public class ToteController {
 
     }
 
+    @PatchMapping("{sourceId}/moveTo/{targetId}")
+    public Tote moveItemsTo(@PathVariable Long sourceId, @PathVariable Long targetId, @RequestBody List<Long> itemIds){
+        Tote sourceTote = toteRepository.findById(sourceId).orElseThrow(() -> new ToteNotFoundException(sourceId));
+        Tote targetTote = toteRepository.findById(targetId).orElseThrow(() -> new ToteNotFoundException(targetId));
+        for(Long itemId : itemIds){
+            ToteItem itemToMove = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("Item not found"));
+            if(!itemToMove.getTote().getId().equals(sourceId)){
+                throw new ItemNotInSourceToteException(itemId, sourceId);
+            }
+            itemToMove.setTote(null);
+            sourceTote.getItems().remove(itemToMove);
+            if(targetTote.addItemFromTote(itemToMove) == ItemMoveStatus.MERGED){
+                itemRepository.deleteById(itemToMove.getId());
+            }
+            if(sourceTote.getNumItems() == 0){
+                toteRepository.delete(sourceTote);
+            }
+
+        }
+        toteRepository.save(targetTote);
+        return targetTote;
+
+    }
+
     @PatchMapping("{id}/editTote")
     public Tote editTote(@PathVariable Long id, @RequestBody ToteUpdateRequest updateRequest){
-        Tote tote = toteRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tote not found"));
+        Tote tote = toteRepository.findById(id).orElseThrow(() -> new ToteNotFoundException(id));
         if(updateRequest.getTemp() != null){
             tote.setTemp(updateRequest.getTemp());
         }
