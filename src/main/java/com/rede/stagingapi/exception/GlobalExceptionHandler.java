@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
+@SuppressWarnings("unused")
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
